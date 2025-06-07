@@ -9,7 +9,7 @@ class GoalInput(BaseModel):
 
 class VocabOut(BaseModel):
     word: str
-    # translation: str
+    translation: str
     # example_sentence: str
     frequency: float
     tags: List[str]

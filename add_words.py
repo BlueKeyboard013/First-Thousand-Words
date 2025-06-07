@@ -2,7 +2,10 @@ from sqlalchemy.orm import Session
 from models import Vocab
 from database import SessionLocal
 from sqlalchemy.dialects.postgresql import ARRAY
-from get_tags import get_tag
+from get_tags import get_tag_v2
+from deep_translator import GoogleTranslator
+
+
 
 def import_word_frequencies(file_path, language="spanish"):
     db: Session = SessionLocal()
@@ -10,13 +13,15 @@ def import_word_frequencies(file_path, language="spanish"):
         for line in f:
             try:
                 word, freq = line.strip().split()
+                tags_set=list(get_tag_v2(word))  # or ["general"] would be getting this from AI 
+                translated_word = GoogleTranslator(source='spanish', target='english').translate(word)
                 vocab = Vocab(
                     word=word,
                     language=language,
-                    # translation="",  # Placeholder
+                    translation=translated_word,  # Placeholder
                     # example_sentence="",  # Placeholder
+                    tags = tags_set,
                     frequency=float(freq),
-                    tags=list(get_tag(word))  # or ["general"] would be getting this from AI 
                 )
                 db.add(vocab)
             except Exception as e:

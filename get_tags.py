@@ -8,7 +8,7 @@ import os
 import shutil
 from dotenv import load_dotenv
 import os
-import argparse
+import openai
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 import word_tags
@@ -76,6 +76,7 @@ Example: communication, personal, travel
 #     # db.persist()
 #     print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
 
+# hallucinating some tags that are not from the tag list.
 def get_tag(word):
 
     # prepare the DB
@@ -95,6 +96,53 @@ def get_tag(word):
     return tags
 
 # main()
-print(get_tag("expectativas"))
+# print(get_tag("expectativas"))
 
 
+def get_tag_v2(user_input: str) -> list[str]:
+    prompt = f"""
+    You are a language learning assistant.
+
+    The user wrote:
+    "{user_input}"
+
+    From this fixed list of tags:
+    {', '.join(word_tags.tags)}
+
+    Pick 1–3 tags that best match the user's goal. You MUST choose only from the list above, even if the match is not perfect.
+    Do NOT make up new tags. Do NOT return 'none'. Choose the closest options based on meaning or context.
+    Return the tags as a comma-separated list (no extra text, no brackets).
+
+    Example output:
+    travel, communication
+    """
+
+    model = ChatOpenAI(api_key=API_KEY)
+    tags = model.predict(prompt)
+
+    tags = [tag.strip() for tag in tags.split(",")]
+    print(f"{user_input}   {tags}")
+    for tag in tags[:]:
+        if tag not in word_tags.tags:
+            print(f"{tag} is not in your set of tags ")
+            new_tags = model.predict(prompt)
+            new_tags_list = [tag.strip() for tag in new_tags.split(",")]
+            tags.extend(new_tags_list)
+  
+    
+    # filter out anything not in the allowed list
+    # return [tag for tag in tags if tag in word_tags.tags]
+    return tags
+
+print(get_tag_v2("complaining"))
+
+"""
+blue -> colors -> art
+quejas -> complaints -> personal
+muriera -> death -> death. 
+"""
+
+"""
+if a tag is not in the list, call the api on that specific tag to get another tag from that tag.
+
+"""
