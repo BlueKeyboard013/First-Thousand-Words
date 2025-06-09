@@ -98,13 +98,12 @@ def get_tag(word):
 # main()
 # print(get_tag("expectativas"))
 
-
-def get_tag_v2(user_input: str) -> list[str]:
+def get_tag_helper(word):
     prompt = f"""
     You are a language learning assistant.
 
     The user wrote:
-    "{user_input}"
+    "{word}"
 
     From this fixed list of tags:
     {', '.join(word_tags.tags)}
@@ -119,22 +118,33 @@ def get_tag_v2(user_input: str) -> list[str]:
 
     model = ChatOpenAI(api_key=API_KEY)
     tags = model.predict(prompt)
-
     tags = [tag.strip() for tag in tags.split(",")]
+
+    return tags
+
+
+def get_tag_v2(user_input: str) -> list[str]:
+
+    tags = get_tag_helper(user_input)
+
+    tags_set = set(tags)
+
     print(f"{user_input}   {tags}")
     for tag in tags[:]:
         if tag not in word_tags.tags:
             print(f"{tag} is not in your set of tags ")
-            new_tags = model.predict(prompt)
-            new_tags_list = [tag.strip() for tag in new_tags.split(",")]
-            tags.extend(new_tags_list)
+            tags_set.remove(tag)
+            new_tags = get_tag_helper(tag)
+            print(f"new tags: {new_tags}")
+            for word in new_tags:
+                tags_set.add(word)
   
     
     # filter out anything not in the allowed list
     # return [tag for tag in tags if tag in word_tags.tags]
-    return tags
+    return tags_set & set(word_tags.tags)
 
-print(get_tag_v2("complaining"))
+print(get_tag_v2("inferior"))
 
 """
 blue -> colors -> art
