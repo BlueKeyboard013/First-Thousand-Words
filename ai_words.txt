@@ -1,0 +1,12 @@
+embeddings:
+    a way to convert words, or phrases into numbers, or high-dimensional vectors (lists of floats) that capture their meaning
+    An embedding is a numerical representation of text that preserves meaning and relationships.
+
+clustering:
+    grouping the similar words together based on their meanings, not their spelling. does this by looking at the words' embeddings.
+    "hospital", "medicine", "emergency" → are close in vector space → clustered as "health"
+    "airport", "flight", "passport" → cluster into "travel"
+
+Semantic Search:
+    semantic search finds results based on meaning, not just keyword matching.
+

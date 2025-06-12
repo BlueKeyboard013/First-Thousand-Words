@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from models import Vocab
 from database import SessionLocal
 from sqlalchemy.dialects.postgresql import ARRAY
-from get_tags import get_tag_v2
+from embeddings.get_tags_embeddings import get_tag_v2
 from deep_translator import GoogleTranslator
 
 
